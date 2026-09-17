@@ -107,7 +107,6 @@
     .chunk .qr { width: 180px; max-width: 100%; }
     .chunk .qr svg { display: block; width: 100%; height: auto; border-radius: 8px; }
     .chunk .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-    .chunk a.ghost { text-decoration: none; display: inline-block; }
     .chunk.done { opacity: 0.45; }
 
     .note { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 0.85rem; color: var(--muted); }
@@ -246,7 +245,6 @@
           <div class="amt">${inr.format(paise / 100)}</div>
           ${vpa ? '<div class="qr"></div>' : '<div class="hint">Add a UPI ID above to get a QR</div>'}
           <div class="actions">
-            ${vpa ? `<a class="ghost" href="${upiLink(vpa, name, paise, note)}">Open in UPI app</a>` : ''}
             <button class="ghost" type="button" data-copy="${(paise / 100).toFixed(2)}">Copy amount</button>
             <button class="ghost" type="button" data-done>Paid</button>
           </div>`;
