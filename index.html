@@ -111,9 +111,6 @@
     .chunk.done { opacity: 0.45; }
 
     .note { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 0.85rem; color: var(--muted); }
-    .note h3 { font-family: Fraunces, Georgia, serif; font-size: 1.1rem; color: var(--ink); margin: 0 0 8px; }
-    .note ul { margin: 0 0 12px; padding-left: 18px; }
-    .note li { margin-bottom: 6px; }
     .note strong { color: var(--ink); font-weight: 600; }
     .note a { color: inherit; }
     .hidden { display: none; }
@@ -168,17 +165,11 @@
       <div class="chunks" id="chunks"></div>
     </section>
 
-    <section class="note" id="disclaimer">
-      <h3>Disclaimer</h3>
-      <ul>
-        <li><strong>Not affiliated</strong> with NPCI, RBI, any bank or any UPI app. This is an independent hobby project.</li>
-        <li><strong>No payments are processed here.</strong> The page only does arithmetic and generates standard UPI QR codes. Nothing you type leaves your browser.</li>
-        <li><strong>Not financial or legal advice.</strong> MDR rules (0.4% on merchant payments above ₹2,000, capped at ₹300, from 15 Oct 2026) are as announced and may change. Confirm with your bank or payment provider.</li>
-        <li><strong>Splitting may breach your merchant agreement</strong> or future NPCI guidelines. Whether to use this is your call and your responsibility.</li>
-        <li><strong>Verify before paying.</strong> Always check the UPI ID and amount shown in your UPI app before confirming. We are not responsible for wrong or failed payments.</li>
-      </ul>
-      <p>Source on <a href="https://github.com/Sudhanshusoni45/split-upi-payment">GitHub</a>. Provided as-is, without warranty of any kind.</p>
-    </section>
+    <p class="note" id="disclaimer">
+      <strong>Disclaimer:</strong> Independent hobby project, not affiliated with NPCI, RBI, any bank or UPI app. No payments are processed here and nothing you type leaves your browser.
+      Not financial or legal advice; MDR rules may change and splitting may breach your merchant agreement, so use at your own risk. Always verify the UPI ID and amount in your app before paying.
+      Provided as-is, without warranty. Source on <a href="https://github.com/Sudhanshusoni45/split-upi-payment">GitHub</a>.
+    </p>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
