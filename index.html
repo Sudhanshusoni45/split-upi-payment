@@ -181,11 +181,18 @@
     const inr = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2 });
 
     // Everything in paise (integers) so we never lose a rupee to float rounding.
+    // Every payment is a whole-rupee amount except the last one, which carries the paise.
+    // Leftover rupees are spread ₹1 each over the first payments so nothing crosses the cap.
     function split(totalPaise, capPaise) {
       const n = Math.max(1, Math.ceil(totalPaise / capPaise));
-      const base = Math.floor(totalPaise / n);
-      const extra = totalPaise - base * n;
-      return Array.from({ length: n }, (_, i) => base + (i < extra ? 1 : 0));
+      if (n === 1) return [totalPaise];
+      const base = Math.floor(totalPaise / n / 100) * 100;
+      const rem = totalPaise - base * n;
+      const extraRupees = Math.floor(rem / 100);
+      const paise = rem % 100;
+      return Array.from({ length: n }, (_, i) =>
+        base + (i < extraRupees ? 100 : 0) + (i === n - 1 ? paise : 0)
+      );
     }
 
     function mdr(totalPaise) {
@@ -216,7 +223,7 @@
 
     function run() {
       const total = Math.round(parseFloat($('amount').value) * 100);
-      const cap = Math.round(parseFloat($('cap').value) * 100);
+      const cap = Math.floor(parseFloat($('cap').value)) * 100;
       if (!(total > 0) || !(cap > 0)) return;
 
       const vpa = $('vpa').value.trim();
