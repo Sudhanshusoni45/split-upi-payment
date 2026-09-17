@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Under 2K</title>
+  <meta name="description" content="Split a merchant UPI payment into chunks under ₹2,000, each with its own scannable UPI QR." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f6f3ec;
+      --surface: #ffffff;
+      --ink: #1a1714;
+      --muted: #6b645b;
+      --line: #e5dfd3;
+      --accent: #e0552b;
+      --accent-ink: #ffffff;
+      --good: #1f7a4d;
+      --good-bg: #e6f4ec;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+      padding: 0 16px 64px;
+    }
+    main { max-width: 760px; margin: 0 auto; }
+
+    header { padding: 48px 0 28px; }
+    h1 {
+      font-family: Fraunces, Georgia, serif;
+      font-weight: 800;
+      font-size: clamp(2.4rem, 8vw, 3.6rem);
+      line-height: 1;
+      margin: 0 0 12px;
+      letter-spacing: -0.02em;
+    }
+    h1 span { color: var(--accent); }
+    header p { margin: 0; color: var(--muted); font-size: 1.05rem; max-width: 52ch; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    form.card { display: grid; gap: 16px; }
+    .row { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
+    @media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
+    label { display: grid; gap: 6px; font-size: 0.85rem; font-weight: 600; color: var(--muted); }
+    .field { position: relative; }
+    .field .prefix {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); font-weight: 600; pointer-events: none;
+    }
+    input {
+      width: 100%;
+      font: inherit;
+      font-size: 1.05rem;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+    input.money { padding-left: 32px; font-variant-numeric: tabular-nums; }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(224, 85, 43, 0.15); }
+    input::placeholder { color: #b5ada2; }
+
+    button {
+      font: inherit; font-weight: 600; cursor: pointer;
+      border-radius: 12px; border: 1px solid transparent;
+      padding: 12px 18px;
+    }
+    .primary { background: var(--accent); color: var(--accent-ink); font-size: 1.05rem; }
+    .primary:hover { filter: brightness(0.95); }
+    .ghost { background: transparent; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); padding: 8px 12px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+    .ghost:hover { background: var(--bg); }
+
+    .summary {
+      margin-top: 24px;
+      display: grid; gap: 12px;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @media (max-width: 520px) { .summary { grid-template-columns: 1fr; } }
+    .stat { padding: 16px; }
+    .stat .k { font-size: 0.8rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .stat .v { font-family: Fraunces, Georgia, serif; font-size: 1.8rem; font-weight: 700; line-height: 1.2; font-variant-numeric: tabular-nums; }
+    .stat.good { background: var(--good-bg); border-color: transparent; }
+    .stat.good .v { color: var(--good); }
+
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin: 28px 0 12px; gap: 12px; flex-wrap: wrap; }
+    .toolbar h2 { font-family: Fraunces, Georgia, serif; font-size: 1.4rem; margin: 0; }
+
+    .chunks { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); }
+    .chunk { display: grid; gap: 12px; justify-items: center; text-align: center; }
+    .chunk .n { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+    .chunk .amt { font-family: Fraunces, Georgia, serif; font-size: 1.7rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .chunk .qr { width: 180px; max-width: 100%; }
+    .chunk .qr svg { display: block; width: 100%; height: auto; border-radius: 8px; }
+    .chunk .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .chunk a.ghost { text-decoration: none; display: inline-block; }
+    .chunk.done { opacity: 0.45; }
+
+    .note { margin-top: 32px; font-size: 0.85rem; color: var(--muted); }
+    .note a { color: inherit; }
+    .hidden { display: none; }
+    .hint { font-size: 0.85rem; color: var(--muted); }
+    .empty { text-align: center; color: var(--muted); padding: 32px; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Under <span>2K</span></h1>
+      <p>Merchant UPI payments above ₹2,000 attract a 0.4% fee from 15 Oct 2026. Split any bill into chunks under ₹2,000 (₹1,999 max), each with its own QR.</p>
+    </header>
+
+    <form class="card" id="form" autocomplete="off">
+      <label>Total amount
+        <span class="field"><span class="prefix">₹</span>
+          <input class="money" id="amount" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="5000" required />
+        </span>
+      </label>
+      <div class="row">
+        <label>Merchant UPI ID <span class="hint">(optional, for QR codes)</span>
+          <input id="vpa" type="text" placeholder="shop@upi" />
+        </label>
+        <label>Payee name <span class="hint">(optional)</span>
+          <input id="name" type="text" placeholder="Sharma Stores" />
+        </label>
+      </div>
+      <div class="row">
+        <label>Max per chunk
+          <span class="field"><span class="prefix">₹</span>
+            <input class="money" id="cap" type="number" inputmode="decimal" min="1" step="1" value="1999" required />
+          </span>
+        </label>
+        <label style="align-self: end;">
+          <button class="primary" type="submit">Split it</button>
+        </label>
+      </div>
+    </form>
+
+    <section id="result" class="hidden">
+      <div class="summary">
+        <div class="card stat"><div class="k">Payments</div><div class="v" id="s-count">—</div></div>
+        <div class="card stat"><div class="k">Each about</div><div class="v" id="s-each">—</div></div>
+        <div class="card stat good"><div class="k">Fee avoided</div><div class="v" id="s-saved">—</div></div>
+      </div>
+
+      <div class="toolbar">
+        <h2>Scan these in order</h2>
+        <button class="ghost" id="copy-all" type="button">Copy list</button>
+      </div>
+      <div class="chunks" id="chunks"></div>
+    </section>
+
+    <p class="note">
+      MDR is 0.4% on person-to-merchant UPI payments above ₹2,000, capped at ₹300. Payments of ₹2,000 or less, P2P transfers and small P2PM merchants are exempt.
+      This is a toy. Whether NPCI will frown on deliberate splitting is their call, not ours.
+    </p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const inr = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2 });
+
+    // Everything in paise (integers) so we never lose a rupee to float rounding.
+    function split(totalPaise, capPaise) {
+      const n = Math.max(1, Math.ceil(totalPaise / capPaise));
+      const base = Math.floor(totalPaise / n);
+      const extra = totalPaise - base * n;
+      return Array.from({ length: n }, (_, i) => base + (i < extra ? 1 : 0));
+    }
+
+    function mdr(totalPaise) {
+      if (totalPaise <= 200000) return 0;
+      return Math.min(Math.round(totalPaise * 0.004), 30000);
+    }
+
+    function upiLink(vpa, name, paise, note) {
+      const p = new URLSearchParams({ pa: vpa, am: (paise / 100).toFixed(2), cu: 'INR' });
+      if (name) p.set('pn', name);
+      if (note) p.set('tn', note);
+      return 'upi://pay?' + p.toString();
+    }
+
+    let lastLines = [];
+
+    function qrSvg(text) {
+      const qr = qrcode(0, 'M');
+      qr.addData(text);
+      qr.make();
+      return qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+    }
+
+    $('form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      run();
+    });
+
+    function run() {
+      const total = Math.round(parseFloat($('amount').value) * 100);
+      const cap = Math.round(parseFloat($('cap').value) * 100);
+      if (!(total > 0) || !(cap > 0)) return;
+
+      const vpa = $('vpa').value.trim();
+      const name = $('name').value.trim();
+      const chunks = split(total, cap);
+
+      $('s-count').textContent = chunks.length;
+      $('s-each').textContent = inr.format(chunks[0] / 100);
+      $('s-saved').textContent = inr.format(mdr(total) / 100);
+
+      const grid = $('chunks');
+      grid.innerHTML = '';
+      lastLines = [];
+
+      if (chunks.length === 1) {
+        grid.innerHTML = '<div class="card empty">Already ₹' + (cap / 100).toLocaleString('en-IN') + ' or under. No fee, no split needed.</div>';
+      }
+
+      for (let i = 0; i < chunks.length; i++) {
+        if (chunks.length === 1) break;
+        const paise = chunks[i];
+        const label = `Payment ${i + 1} of ${chunks.length}`;
+        const note = `${i + 1}/${chunks.length}`;
+        lastLines.push(`${label}: ${inr.format(paise / 100)}`);
+
+        const el = document.createElement('div');
+        el.className = 'card chunk';
+        el.innerHTML = `
+          <div class="n">${label}</div>
+          <div class="amt">${inr.format(paise / 100)}</div>
+          ${vpa ? '<div class="qr"></div>' : '<div class="hint">Add a UPI ID above to get a QR</div>'}
+          <div class="actions">
+            ${vpa ? `<a class="ghost" href="${upiLink(vpa, name, paise, note)}">Open in UPI app</a>` : ''}
+            <button class="ghost" type="button" data-copy="${(paise / 100).toFixed(2)}">Copy amount</button>
+            <button class="ghost" type="button" data-done>Paid</button>
+          </div>`;
+        grid.appendChild(el);
+
+        if (vpa) el.querySelector('.qr').innerHTML = qrSvg(upiLink(vpa, name, paise, note));
+      }
+
+      const q = new URLSearchParams({ amount: (total / 100).toFixed(2) });
+      if (vpa) q.set('vpa', vpa);
+      if (name) q.set('name', name);
+      if (cap !== 199900) q.set('cap', (cap / 100).toFixed(2));
+      try { history.replaceState(null, '', '?' + q.toString()); } catch (_) {}
+
+      $('result').classList.remove('hidden');
+      $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Prefill from a shared link like ?amount=5000&vpa=shop@upi&name=Sharma
+    (function () {
+      const q = new URLSearchParams(location.search);
+      if (!q.get('amount')) return;
+      $('amount').value = q.get('amount');
+      if (q.get('vpa')) $('vpa').value = q.get('vpa');
+      if (q.get('name')) $('name').value = q.get('name');
+      if (q.get('cap')) $('cap').value = q.get('cap');
+      run();
+    })();
+
+    $('chunks').addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      if (btn.dataset.copy) {
+        navigator.clipboard.writeText(btn.dataset.copy).then(() => flash(btn, 'Copied'));
+      } else if ('done' in btn.dataset) {
+        btn.closest('.chunk').classList.toggle('done');
+      }
+    });
+
+    $('copy-all').addEventListener('click', (e) => {
+      navigator.clipboard.writeText(lastLines.join('\n')).then(() => flash(e.target, 'Copied'));
+    });
+
+    function flash(btn, text) {
+      const old = btn.textContent;
+      btn.textContent = text;
+      setTimeout(() => (btn.textContent = old), 1200);
+    }
+  </script>
+</body>
+</html>
