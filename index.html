@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Under 2K</title>
   <meta name="description" content="Split a merchant UPI payment into chunks under ₹2,000, each with its own scannable UPI QR." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23e0552b'/%3E%3Ctext x='32' y='46' text-anchor='middle' font-family='Georgia,serif' font-weight='700' font-size='40' fill='%23fff'%3E%E2%82%B9%3C/text%3E%3C/svg%3E" />
+  <meta name="theme-color" content="#e0552b" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
@@ -108,7 +110,11 @@
     .chunk a.ghost { text-decoration: none; display: inline-block; }
     .chunk.done { opacity: 0.45; }
 
-    .note { margin-top: 32px; font-size: 0.85rem; color: var(--muted); }
+    .note { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 0.85rem; color: var(--muted); }
+    .note h3 { font-family: Fraunces, Georgia, serif; font-size: 1.1rem; color: var(--ink); margin: 0 0 8px; }
+    .note ul { margin: 0 0 12px; padding-left: 18px; }
+    .note li { margin-bottom: 6px; }
+    .note strong { color: var(--ink); font-weight: 600; }
     .note a { color: inherit; }
     .hidden { display: none; }
     .hint { font-size: 0.85rem; color: var(--muted); }
@@ -162,10 +168,17 @@
       <div class="chunks" id="chunks"></div>
     </section>
 
-    <p class="note">
-      MDR is 0.4% on person-to-merchant UPI payments above ₹2,000, capped at ₹300. Payments of ₹2,000 or less, P2P transfers and small P2PM merchants are exempt.
-      This is a toy. Whether NPCI will frown on deliberate splitting is their call, not ours.
-    </p>
+    <section class="note" id="disclaimer">
+      <h3>Disclaimer</h3>
+      <ul>
+        <li><strong>Not affiliated</strong> with NPCI, RBI, any bank or any UPI app. This is an independent hobby project.</li>
+        <li><strong>No payments are processed here.</strong> The page only does arithmetic and generates standard UPI QR codes. Nothing you type leaves your browser.</li>
+        <li><strong>Not financial or legal advice.</strong> MDR rules (0.4% on merchant payments above ₹2,000, capped at ₹300, from 15 Oct 2026) are as announced and may change. Confirm with your bank or payment provider.</li>
+        <li><strong>Splitting may breach your merchant agreement</strong> or future NPCI guidelines. Whether to use this is your call and your responsibility.</li>
+        <li><strong>Verify before paying.</strong> Always check the UPI ID and amount shown in your UPI app before confirming. We are not responsible for wrong or failed payments.</li>
+      </ul>
+      <p>Source on <a href="https://github.com/Sudhanshusoni45/split-upi-payment">GitHub</a>. Provided as-is, without warranty of any kind.</p>
+    </section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
